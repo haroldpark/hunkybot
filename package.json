@@ -1,0 +1,23 @@
+{
+  "name": "hunkybot",
+  "version": "1.0.0",
+  "description": "My own discord bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyungkip/hunkybot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hyungkip/hunkybot/issues"
+  },
+  "homepage": "https://github.com/hyungkip/hunkybot#readme",
+  "dependencies": {
+    "discord.js": "^11.0.0",
+    "request": "^2.81.0"
+  }
+}
