@@ -1,213 +1,184 @@
+const request = require('request');
 const Discord = require('discord.js');
 const bot = new Discord.Client();
+
+const http_request = require('request');
+const helpers = require('./app/helpers/helpers.js');
+
+//models
+const Request = require('./models/Request.js');
+const Response = require('./models/Response.js');
+
 const config = require('./config.json');
-const request = require('request');
 const prefix = config.prefix;
-const SUITS = [':spades:', ':clubs:', ':hearts:', ':diamonds:'];
-const VALUES = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-class Card {
-  constructor (value, suit) {
-    this.suit = suit;
-    this.value = value;
-  }
-}
+const youtubeStream = require('youtube-audio-stream')
 
-class Deck {
-  constructor () {
-    this.deck = [];
+bot.on('message', msg => {
+  //prefix is $
+  if (msg.content == 'test') {
   }
 
-  makeDeck () {
-    for (let i=0; i<SUITS.length; i++) {
-      for (let j=0; j<VALUES.length; j++) {
-        let card = new Card(VALUES[j], SUITS[i])
-        this.deck.push(card);
-      }
+  if (msg.content.startsWith(prefix)) {
+    //Verifies that message starts with our prefix
+    let request = new Request(msg.content);
+    let command = request.command;
+    let category = request.category;
+    let query = request.query;
+
+    if (!request.validateCommand()) {
+      //Error handler for when a weird command is inputted
+      const embed = new Discord.RichEmbed()
+        .setTitle('Warning')
+        .setColor('#B22222')
+        .setDescription('You have entered an invalid command!')
+      return msg.channel.send({embed})
     }
-  }
 
-  shuffle () {
-    var currentIndex = this.deck.length, temporaryValue, randomIndex;
-
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
-
-      // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
-
-      // And swap it with the current element.
-      temporaryValue = this.deck[currentIndex];
-      this.deck[currentIndex] = this.deck[randomIndex];
-      this.deck[randomIndex] = temporaryValue;
+    if (command == 'help') {
+      const embed = new Discord.RichEmbed()
+        .setTitle('Command list')
+        //.setAuthor('Author Name', 'https://i.imgur.com/lm8s41J.png')
+        .setColor('#00AE86')
+        .setDescription('Here are the bot\'s commands! Use the format "$<command> <category *only for certain commands*> <query>"')
+        .addField('$ffxiv <category> <query>', 'Only "items" category is available at the moment')
+        .addField('$giphy <query>', 'Get a random giphy!')
+        .addField('$soundboard <query>', 'Play a sound on your current voice channel. Available search queries: allahuakbar, babyatriple, ballsofsteel, boomheadshot, bruh, crickets, dramaticchipmunk, falconpunch, finishhim, hadouken, heylisten, iknowkungfu, metalgear, mlgairhorn, nooo, over9000, saywhatagain, silenceikillyou, sonicboom, sparta, trollolol, victoryff, wrongnumber, wtfboom, xfiles');
+      return msg.channel.send({embed})
     }
-    return this.deck;
-  }
-}
 
-class Blackjack extends Deck {
-  constructor (firstplayer) {
-    super();
-    this.players = [new BlackjackPlayer('Dealer'), new BlackjackPlayer(firstplayer)];
-  }
-  addPlayer (username) {
-    let newPlayer = new BlackjackPlayer(username);
-    // newPlayer.hand.push(this.deck)
-    // this.players.push(newPlayer);
-    // this.players[i].hand.push(this.deck.shift());
-    // this.players[i].hand.push(this.deck.shift());
-  }
-
-  init () {
-    this.makeDeck();
-    this.shuffle();
-  }
-
-  deal () {
-    for (let i=0; i<this.players.length; i++) {
-      this.players[i].hand.push(this.deck.shift());
-      this.players[i].hand.push(this.deck.shift());
-      this.players[i].calculateHand();
-    }
-  }
-
-  makeDeck () {
-    super.makeDeck();
-  }
-
-  shuffle () {
-    super.shuffle();
-  }
-}
-
-class Player {
-  constructor (username) {
-    this.username = username;
-    this.hand = [];
-  }
-}
-
-class BlackjackPlayer extends Player {
-  constructor (tag) {
-    super(tag);
-    this.total;
-  }
-  hit (deck) {
-    this.hand.push(deck.shift());
-    this.calculateHand();
-  }
-  calculateHand () {
-    let total = 0;
-    for (let i=0; i<this.hand.length; i++) {
-      if (this.hand[i].value == 'J' || this.hand[i].value == 'Q' || this.hand[i].value == 'K' || this.hand[i].value == 'A') {
-        total += 10;
+    if (command == 'soundboard') {
+      const voiceChannel = msg.member.voiceChannel;
+      if (voiceChannel) {
+        voiceChannel.join().then(connection => {
+          //const stream = youtubeStream('https://www.youtube.com/watch?v=jUqYrdK-H6g')
+          //const dispatcher = connection.playStream(stream)
+          const dispatcher = connection.playFile('./app/lib/' + query + '.mp3');
+          dispatcher.on("end", end => {
+            voiceChannel.leave();
+          });
+        }).catch(err => console.log(err));
       } else {
-        total += parseInt(this.hand[i].value);
+        //do this when user is not in a voice channel
+        const embed = new Discord.RichEmbed()
+          .setTitle('Warning')
+          .setColor('#B22222')
+          .setDescription('You are currently not in a voice channel!')
+        return msg.channel.send({embed})
       }
     }
-    this.total = total;
+
+    if (command == 'shoppingcart') {
+      let message = '';
+
+      var recipeData = helpers.api.searchRecipes('scrambled+eggs', function (recipeData) {
+        console.log (recipeData, 'RECIPEDATA');
+        message += 'Your search returned ' + recipeData.total + ' responses';
+      });
+
+      //for (var i=0; i<recipeData.)
+      //helpers.giveOptions()
+
+    }
+
+
+
+
+
+
+    if (command == 'ffxiv') {
+      return require('./app/commands/ffxiv/item.js')(query, msg.channel);
+  	}
+
+
+
+
+
+
+  	if (msg.content.startsWith(prefix + 'giphy')) {
+
+      let string = request.category;
+
+      http_request('http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag='+ string, function (error, response, body) {
+        if (error) {
+          console.log('error:', error);
+          return;
+        }
+        let url = JSON.parse(body).data.url;
+        return msg.channel.sendMessage('Here is a random gif of: ' + string + '\n' + url);
+      });
+  	}
+
+    if (msg.content.startsWith(prefix + 'blackjack play')) {
+      let userTag = msg.member.user.username + msg.member.user.discriminator;
+      let gameStarted = false;
+      let blackjack = new Blackjack(userTag);
+
+
+      msg.channel.sendMessage(userTag + ' has started a blackjack game! Type in "$blackjack join" to play');
+
+
+
+        bot.on('message', sss => {
+          if (sss == prefix + 'blackjack start') {
+            blackjack.init();
+            blackjack.deal();
+
+
+            sss.channel.sendMessage('Blackjack has started! Here are your hands:');
+            for (var i=0; i<blackjack.players.length; i++) {
+              var prompt = blackjack.players[i].username + '\'s hand: '
+              for (var j=0; j<blackjack.players[i].hand.length; j++) {
+                prompt += blackjack.players[i].hand[j].value;
+                prompt += ' of ';
+                prompt += blackjack.players[i].hand[j].suit;
+                prompt += ', ';
+              }
+              sss.channel.sendMessage(prompt);
+
+            }
+
+          }
+
+          bot.on('message', eee => {
+            if (eee == prefix + 'blackjack hit') {
+              let player =  eee.member.user.username + eee.member.user.discriminator;
+              let total;
+              let prompt;
+
+              console.log('HERE IS THE PLAYER WHO HIT', player);
+              for (var i=0; i<blackjack.players.length; i++) {
+                if (blackjack.players[i].username == player) {
+                  blackjack.players[i].hit(blackjack.deck);
+                  total = blackjack.players[i].total;
+
+
+                  for (var j=0; j<blackjack.players[i].hand.length; j++) {
+                    prompt += blackjack.players[i].hand[j].value;
+                    prompt += 'of';
+                    prompt += blackjack.players[i].hand[j].suit;
+                    prompt += ', ';
+                  }
+
+
+                }
+              }
+
+              console.log('here is the players', blackjack.players)
+              eee.channel.sendMessage(player + ' has hit. Your total is now: ' + total);
+              eee.channel.sendMessage(prompt);
+            }
+          });
+        });
+      }
+
+
   }
-}
-
-
-
+});
 
 bot.login(config.token);
 
-bot.on('message', msg => {
-  if (!msg.content.startsWith(prefix)) {
-    return;
-  }
 
-	if (msg.content.startsWith(prefix + 'giphy')) {
-    let arguments = msg.content.split(' ').slice(1);
-    let query = arguments.join(' ');
-
-    request('http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag='+ query, function (error, response, body) {
-      if (error) {
-        console.log('error:', error);
-        return;
-      }
-      let gif = JSON.parse(body).data.url;
-      msg.channel.sendMessage('Here is a random gif of: ' + query + '\n' + gif);
-    });
-	}
-
-  if (msg.content.startsWith(prefix + 'blackjack play')) {
-    let userTag = msg.member.user.username + msg.member.user.discriminator;
-    let gameStarted = false;
-    let blackjack = new Blackjack(userTag);
-
-
-    msg.channel.sendMessage(userTag + ' has started a blackjack game! Type in "$blackjack join" to play');
-
-
-
-      bot.on('message', sss => {
-        if (sss == prefix + 'blackjack start') {
-          blackjack.init();
-          blackjack.deal();
-
-
-          sss.channel.sendMessage('Blackjack has started! Here are your hands:');
-          for (var i=0; i<blackjack.players.length; i++) {
-            var prompt = blackjack.players[i].username + '\'s hand: '
-            for (var j=0; j<blackjack.players[i].hand.length; j++) {
-              prompt += blackjack.players[i].hand[j].value;
-              prompt += ' of ';
-              prompt += blackjack.players[i].hand[j].suit;
-              prompt += ', ';
-            }
-            sss.channel.sendMessage(prompt);
-
-          }
-
-        }
-
-        bot.on('message', eee => {
-          if (eee == prefix + 'blackjack hit') {
-            let player =  eee.member.user.username + eee.member.user.discriminator;
-            let total;
-            let prompt;
-
-            console.log('HERE IS THE PLAYER WHO HIT', player);
-            for (var i=0; i<blackjack.players.length; i++) {
-              if (blackjack.players[i].username == player) {
-                blackjack.players[i].hit(blackjack.deck);
-                total = blackjack.players[i].total;
-
-
-                for (var j=0; j<blackjack.players[i].hand.length; j++) {
-                  prompt += blackjack.players[i].hand[j].value;
-                  prompt += 'of';
-                  prompt += blackjack.players[i].hand[j].suit;
-                  prompt += ', ';
-                }
-
-
-              }
-            }
-
-            console.log('here is the players', blackjack.players)
-            eee.channel.sendMessage(player + ' has hit. Your total is now: ' + total);
-            eee.channel.sendMessage(prompt);
-          }
-        });
-      });
-
-
-
-    // msg.channel.sendMessage();
-    // (function () {
-    //   setTimeout(function() {
-    //     console.log('hihihihihi');
-    //
-    //   }, 15000);
-    // })();
-
-	}
-});
 
 // (function () {
 //   let user = 'kek';
@@ -230,4 +201,4 @@ bot.on('message', msg => {
 // })();
 
 
-console.log('discord bot is running!');
+console.log('Discord bot is running!');
