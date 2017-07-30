@@ -1,6 +1,7 @@
 const helpers = require('../../helpers/helpers.js');
 const http_request = require('request');
 const Discord = require('discord.js');
+const ffxivHelpers = require('../../helpers/ffxiv_helpers.js');
 
 module.exports = function (query, channel) {
 
@@ -29,115 +30,81 @@ module.exports = function (query, channel) {
           let detailedData = JSON.parse(body2);
           //let relevantData = helpers.getRelevantData(searchData, detailedData);
 
-          let kind_name = searchData.kind_name;
-          let armsProperties = ['level_equip', 'level_item', 'attributes_base', 'attributes_params', 'can_be_hq', 'craftable', 'item_glamour', 'price_sell', 'price_sell_hq']
+          //Data from first request
           let name = searchData.name;
-          let url_xivdb = searchData.url_xivdb;
-          let category_name = searchData.category_name;
+          let kindName = searchData.kind_name;
+          let urlXivdb = searchData.url_xivdb;
           let icon = searchData.icon;
 
-          let slot_name = detailedData.slot_name;
-          let level_equip = detailedData.level_equip;
-          let level_item = detailedData.level_item;
-          let can_be_hq = ((detailedData.can_be_hq) ? 'Yes' : 'No');
-          let price_sell = ((detailedData.can_be_hq) ? detailedData.price_sell + '(' + detailedData.price_sell_hq + '*) ' : detailedData.price_sell);
+          //Detailed data from second request
           let patch = detailedData.patch.number;
-          let attributes_base = detailedData.attributes_base;
-          let attributes_params = detailedData.attributes_params;
-          let craftable = ((detailedData.craftable) ? 'Yes' : 'No');
-          let item_glamour = ((detailedData.item_glamour) ? '[' + detailedData.item_glamour.name + '](' + detailedData.item_glamour.url_xivdb : undefined);
+          let priceSell = ((detailedData.can_be_hq) ? detailedData.price_sell + '(' + detailedData.price_sell_hq + '*) ' : detailedData.price_sell);
+          let canBeHq = ((detailedData.can_be_hq) ? true : false);
 
-          let quests = '';
-          for (let i=0; i<detailedData.quests.length; i++) {
-            quests += '[' + detailedData.quests[i].name + '](' + detailedData.quests[i].url_xivdb + ')';
-            quests += ': ' + detailedData.quests[i].class_category_1 + ' ' + detailedData.quests[i].class_level_1
+          let levelEquip = detailedData.level_equip;
+          let levelItem = detailedData.level_item;
+          let classJob = detailedData.classjob_category;
+          let slotName = detailedData.slot_name;
+
+          let materiaSlotCount = detailedData.materia_slot_count;
+          let otherPropData = {
+            'Collectable': detailedData.is_collectable,
+            'Convertible': detailedData.is_convertible,
+            'CrestWorthy': detailedData.is_crest_worthy,
+            'Desynthesizable': detailedData.is_desynthesizable,
+            'Dyeable': detailedData.is_dyeable,
+            'Projectable': detailedData.is_projectable,
+            'Reducible': detailedData.is_reducible,
+            'Unique': detailedData.is_unique,
+            'Untradable': detailedData.is_untradabale
           }
+          let otherProps = ffxivHelpers.item.packageOtherProps(otherPropData)
+
+          let questRewards = ffxivHelpers.item.packageQuestReward(detailedData.quests);
+/*
+
+          let craftable = ((detailedData.craftable) ? 'Yes' : 'No');
+          let item_glamour = ((detailedDatchooa.item_glamour) ? '[' + detailedData.item_glamour.name + '](' + detailedData.item_glamour.url_xivdb : undefined);
 
 
-          //HAVE TO INVLUDE HQ functionality
+          */
 
-          let baseStats = '';
-          let itemAttributes = '';
-
-          if (attributes_params.length) {
-            for (let i=0; i<attributes_params.length; i++) {
-              if (attributes_params[i].name) {
-                itemAttributes += '*' + attributes_params[i].name + '*: ' + attributes_params[i].value + ' (' + attributes_params[i].value_hq + ' HQ)';
-                if (i !== attributes_params.length - 1) {
-                  itemAttributes += ' | ';
-                }
-              }
-            }
-          } else {
-            itemAttributes += 'None';
-          };
+          let baseStats = ffxivHelpers.item.packageBaseStats(kindName, detailedData.attributes_base, canBeHq);
+          let attributes = ffxivHelpers.item.packageAttributes(detailedData.attributes_params);
+          let recipes = ffxivHelpers.item.packageRecipes(detailedData.craftable);
 
           const embed = new Discord.RichEmbed()
             .setTitle(name)
-            .setURL(url_xivdb)
+            .setURL(urlXivdb)
             .setColor(0x00AE86)
             //.setDescription(category_name)
             .setThumbnail(icon)
-          embed.addField('Attributes', itemAttributes);
-          embed.addField('Can be HQ', can_be_hq, true);
-          embed.addField('Craftable', craftable, true);
-          embed.addField('Item level', level_item, true);
-          embed.addField('Quest Reward', quests)
+          embed.addField('Base Stats', baseStats);
+          embed.addField('Attributes', attributes);
+          embed.addField('Item level', levelItem, true);
+          embed.addField('Equip level', levelEquip, true);
 
-          if (kind_name == 'Arms' || kind_name == 'Armor') {
+          embed.addField('Class/Job', classJob, true);
+          embed.addField('Category', kindName)
+          embed.addField('Slot', slotName, true);
+          embed.addField('Materia Slots', materiaSlotCount, true);
+          embed.addField('Other Properties', otherProps);
 
-            if (kind_name == 'Arms') {
-              let auto_attackTemplate = '*Auto Attack*: ' + attributes_base['auto_attack'];
-              let auto_attackDesc = ((!detailedData.can_be_hq) ? auto_attackTemplate : auto_attackTemplate + '(' + attributes_base['auto_attack_hq'] + '*)')
-              let damageTemplate = '*Damage*: ' + attributes_base['damage'];
-              let damageDesc = ((!detailedData.can_be_hq) ? damageTemplate : damageTemplate + '(' + attributes_base['damage_hq'] + '*)')
-              let delayTemplate = '*Delay*: ' + attributes_base['delay'];
-              let delayDesc = ((!detailedData.can_be_hq) ? delayTemplate : delayTemplate + '(' + attributes_base['delay_hq'] + '*)')
-              let magicDamageTemplate = '*Magic Damage*: ' + attributes_base['magic_damage'];
-              let magicDamageDesc = ((can_be_hq) ? magicDamageTemplate : magicDamageTemplate + '(' + attributes_base['magic_damage_hq'] + '*)')
-              baseStats += auto_attackDesc + ' | ' + damageDesc + ' | ' + delayDesc + ' | ' + magicDamageDesc;
-
-              embed.addField('Equip level', level_equip, true);
-              embed.addField('Slot', slot_name, true);
-              embed.addField('Can be HQ', can_be_hq, true);
-              embed.addField('Glamor Item', item_glamour, true);
-              embed.addField('Craftable', craftable, true);
-              embed.addField('Base Stats', baseStats);
-            }
-
-            if (kind_name == 'Armor') {
-              if (category_name == 'Shield') {
-                let blockRateTemplate = '*Block Rate*: ' + attributes_base['block_rate'];
-                let blockRateDesc = ((!detailedData.can_be_hq) ? blockRateTemplate : blockRateTemplate + '(' + attributes_base['block_rate_hq'] + '*)')
-                let blockStrengthTemplate = '*Block Strength*: ' + attributes_base['block_strength'];
-                let blockStrengthDesc = ((!detailedData.can_be_hq) ? blockStrengthTemplate : blockStrengthTemplate + '(' + attributes_base['block_strength_hq'] + '*)');
-                baseStats += blockRateDesc + ' | ' + blockStrengthDesc;
-              } else {
-                let defenseTemplate = '*Defense*: ' + attributes_base['defense'];
-                let defenseDesc = ((!detailedData.can_be_hq) ? defenseTemplate : defenseTemplate + '(' + attributes_base['defense_hq'] + '*)')
-                let magicDefenseTemplate = '*Magic Defense*: ' + attributes_base['magic_defense'];
-                let magicDefenseDesc = ((!detailedData.can_be_hq) ? magicDefenseTemplate : magicDefenseTemplate + '(' + attributes_base['magic_defense_hq'] + '*)');
-                baseStats += defenseDesc + ' | ' + magicDefenseDesc;
-                embed.addField('Equip level', level_equip, true);
-                embed.addField('Slot', slot_name, true);
-                embed.addField('Glamor Item', item_glamour, true);
-                embed.addField('Base Stats', baseStats);
-              }
+          //embed.addField('Recipe')
+          embed.addField('Quest Reward', questRewards);
+          //embed.addField('Merchant')
 
 
-            }
 
-          }
 
-          if (kind_name == 'Medicines & Meals') {
-            if (category_name == 'Meal') {
+          //embed.addField('Can be HQ', can_be_hq, true);
+          //embed.addField('Craftable', craftable, true);
+          //embed.addField('Rewarded From:', quests)
+          //embed.addField('Glamor Item', item_glamour, true);
 
-            }
-
-          }
 
             //embed.addField('Attributes', relevantData.craftable)
-            embed.setFooter('Released patch ' + patch + ' | Sells for ' + price_sell, 'http://i.imgur.com/w1vhFSR.png')
+            embed.setFooter('Released patch ' + patch + ' | Sells for ' + priceSell, 'http://i.imgur.com/w1vhFSR.png')
             return channel.send({embed});
 
           }
