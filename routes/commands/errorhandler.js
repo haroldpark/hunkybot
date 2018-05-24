@@ -1,5 +1,4 @@
-module.exports = (msg, embed) {
-  //testing stuff
+module.exports = (msg, embed) => {
   //Error handler for when a weird command is inputted
   embed.setTitle('Warning')
     .setColor('#B22222')

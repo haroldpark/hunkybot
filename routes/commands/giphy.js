@@ -1,4 +1,4 @@
-module.exports = function (msg, request) {
+module.exports = (msg, request) => {
   const http_request = require('request');
   let string = request.query;
   http_request('http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag='+ string, function (error, response, body) {

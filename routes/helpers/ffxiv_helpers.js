@@ -1,10 +1,7 @@
 module.exports = {
   item:  {
     packageBaseStats: function (kind, attributes_base, canHq) {
-
-
       if (kind == 'Arms' || kind == 'Armor') {
-
         if (kind == 'Arms') {
           let auto_attackTemplate = '*Auto Attack*: ' + attributes_base['auto_attack'];
           let auto_attackDesc = ((!canHq) ? auto_attackTemplate : auto_attackTemplate + '(' + attributes_base['auto_attack_hq'] + '*)')
@@ -15,12 +12,9 @@ module.exports = {
           let magicDamageTemplate = '*Magic Damage*: ' + attributes_base['magic_damage'];
           let magicDamageDesc = ((!canHq) ? magicDamageTemplate : magicDamageTemplate + '(' + attributes_base['magic_damage_hq'] + '*)')
           return auto_attackDesc + ' | ' + damageDesc + ' | ' + delayDesc + ' | ' + magicDamageDesc;
-
-
         }
 
         if (kind == 'Armor') {
-
           /*
           if (category_name == 'Shield') {
             let blockRateTemplate = '*Block Rate*: ' + attributes_base['block_rate'];
@@ -30,39 +24,18 @@ module.exports = {
             baseStats += blockRateDesc + ' | ' + blockStrengthDesc;
           }
           */
-          //else {
-            let defenseTemplate = '*Defense*: ' + attributes_base['defense'];
-            let defenseDesc = ((!canHq) ? defenseTemplate : defenseTemplate + '(' + attributes_base['defense_hq'] + 'HQ)')
-            let magicDefenseTemplate = '*Magic Defense*: ' + attributes_base['magic_defense'];
-            let magicDefenseDesc = ((!canHq) ? magicDefenseTemplate : magicDefenseTemplate + '(' + attributes_base['magic_defense_hq'] + 'HQ)');
-            return defenseDesc + ' | ' + magicDefenseDesc;
-
-          //}
-
-
+          let defenseTemplate = '*Defense*: ' + attributes_base['defense'];
+          let defenseDesc = ((!canHq) ? defenseTemplate : defenseTemplate + '(' + attributes_base['defense_hq'] + 'HQ)')
+          let magicDefenseTemplate = '*Magic Defense*: ' + attributes_base['magic_defense'];
+          let magicDefenseDesc = ((!canHq) ? magicDefenseTemplate : magicDefenseTemplate + '(' + attributes_base['magic_defense_hq'] + 'HQ)');
+          return defenseDesc + ' | ' + magicDefenseDesc;
         }
-
       }
 
       if (kind == 'Medicines & Meals') {
         if (category_name == 'Meal') {
-
         }
-
       }
-
-
-
-
-
-
-
-
-
-
-
-
-
     },
 
     packageAttributes: function (attributes) {
@@ -112,13 +85,7 @@ module.exports = {
     packageMerchant: function () {
 
     }
-
   }
-
   //more categories here
-
-
-
-
 
 }

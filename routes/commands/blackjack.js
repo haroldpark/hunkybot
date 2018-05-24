@@ -10,9 +10,9 @@ module.exports = (bot, msg) => {
         blackjack.deal();
 
         sss.channel.sendMessage('Blackjack has started! Here are your hands:');
-        for (var i=0; i<blackjack.players.length; i++) {
-          var prompt = blackjack.players[i].username + '\'s hand: '
-          for (var j=0; j<blackjack.players[i].hand.length; j++) {
+        for (let i=0; i<blackjack.players.length; i++) {
+          let prompt = blackjack.players[i].username + '\'s hand: '
+          for (let j=0; j<blackjack.players[i].hand.length; j++) {
             prompt += blackjack.players[i].hand[j].value;
             prompt += ' of ';
             prompt += blackjack.players[i].hand[j].suit;
@@ -29,12 +29,12 @@ module.exports = (bot, msg) => {
         let prompt;
 
         console.log('HERE IS THE PLAYER WHO HIT', player);
-        for (var i=0; i<blackjack.players.length; i++) {
+        for (let i=0; i<blackjack.players.length; i++) {
           if (blackjack.players[i].username == player) {
             blackjack.players[i].hit(blackjack.deck);
             total = blackjack.players[i].total;
 
-            for (var j=0; j<blackjack.players[i].hand.length; j++) {
+            for (let j=0; j<blackjack.players[i].hand.length; j++) {
               prompt += blackjack.players[i].hand[j].value;
               prompt += 'of';
               prompt += blackjack.players[i].hand[j].suit;

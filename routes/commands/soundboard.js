@@ -1,4 +1,5 @@
-module.exports = function (msg, embed) {
+module.exports = (msg, embed) => {
+  const youtubeStream = require('youtube-audio-stream');
   const voiceChannel = msg.member.voiceChannel;
   if (voiceChannel) {
     voiceChannel.join().then(connection => {
@@ -13,7 +14,7 @@ module.exports = function (msg, embed) {
     //do this when user is not in a voice channel
     embed.setTitle('Warning')
       .setColor('#B22222')
-      .setDescription('You are currently not in a voice channel!')
-    return msg.channel.send({embed})
+      .setDescription('You are currently not in a voice channel!');
+    return msg.channel.send({embed});
   }
 }

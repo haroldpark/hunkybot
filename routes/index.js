@@ -15,7 +15,7 @@ module.exports = (config) => {
       require("./test")();
     }
 
-    //this if statement verifies that message starts with our prefix
+    //verifies that message starts with our prefix
     if (msg.content.startsWith(prefix)) {
       let request = new Request(msg.content);
       let command = request.command;
@@ -26,6 +26,7 @@ module.exports = (config) => {
         return require("./commands/errorhandler")(msg, embed);
       }
 
+      //routes for commands
       if (command == 'help') {
         return require("./commands/help")(msg, embed);
       }
@@ -52,5 +53,6 @@ module.exports = (config) => {
     }
   });
 
+  //instantiates bot with token
   bot.login(config.token);
 }

@@ -23,7 +23,7 @@ class Deck {
   }
 
   shuffle () {
-    var currentIndex = this.deck.length, temporaryValue, randomIndex;
+    let currentIndex = this.deck.length, temporaryValue, randomIndex;
 
     // While there remain elements to shuffle...
     while (0 !== currentIndex) {

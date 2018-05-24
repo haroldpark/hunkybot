@@ -91,10 +91,10 @@ module.exports = (query, channel) => {
           //embed.addField('Rewarded From:', quests)
           //embed.addField('Glamor Item', item_glamour, true);
             //embed.addField('Attributes', relevantData.craftable)
-            embed.setFooter('Released patch ' + patch + ' | Sells for ' + priceSell, 'http://i.imgur.com/w1vhFSR.png')
-            return channel.send({embed});
-          }
-        });
-      }
-    });
+          embed.setFooter('Released patch ' + patch + ' | Sells for ' + priceSell, 'http://i.imgur.com/w1vhFSR.png')
+          return channel.send({embed});
+        }
+      });
+    }
+  });
 }

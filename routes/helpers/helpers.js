@@ -19,12 +19,10 @@ module.exports = {
   giveOptions: function (namesArray) {
     let message = '';
     message += namesArray.join(' ');
-
     return message;
   },
 
   findTargetResult: function (resultsArray, targetStr) {
-
     for (let i=0; i<resultsArray.length; i++) {
       if (resultsArray[i].name.toLowerCase() == targetStr.toLowerCase()) {
         return resultsArray[i];
@@ -66,17 +64,12 @@ module.exports = {
         magicDefense: detailedData.attributes_base.auto_attack
       }
     }
-
-
     return relevantData;
   },
 
   packageEmbedMessage: function () {
-
-    const embed = new Discord.RichEmbed()
-      .setTitle('dfdfdfd')
-
-      return embed;
+    const embed = new Discord.RichEmbed().setTitle('dfdfdfd')
+    return embed;
   },
 
   api: {
@@ -89,23 +82,10 @@ module.exports = {
             return;
           } else {
             let data = JSON.parse(body);
-            console.log('HERE IS DATA', data);
-
-            /*
-            for (var i=0; i<data.results.length; i++) {
-              request(data.results[i].url_api, function (err, resp, bod) {
-                let chunk = JSON.parse(bod[])
-              })
-
-            }
-            */
+            console.log('data is here', data);
             return data;
           }
         });
     }
-
-
-
   }
-
 }
