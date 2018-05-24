@@ -3,7 +3,7 @@ const http_request = require('request');
 const Discord = require('discord.js');
 const ffxivHelpers = require('../../helpers/ffxiv_helpers.js');
 
-module.exports = function (query, channel) {
+module.exports = (query, channel) => {
 
   let requestUrl = 'http://api.xivdb.com/search?one=items&string='+ query;
   console.log('QUERY:', query, 'REQUESTURL:', requestUrl);
@@ -59,15 +59,10 @@ module.exports = function (query, channel) {
             'Untradable': detailedData.is_untradabale
           }
           let otherProps = ffxivHelpers.item.packageOtherProps(otherPropData)
-
           let questRewards = ffxivHelpers.item.packageQuestReward(detailedData.quests);
-/*
 
-          let craftable = ((detailedData.craftable) ? 'Yes' : 'No');
-          let item_glamour = ((detailedDatchooa.item_glamour) ? '[' + detailedData.item_glamour.name + '](' + detailedData.item_glamour.url_xivdb : undefined);
-
-
-          */
+          //let craftable = ((detailedData.craftable) ? 'Yes' : 'No');
+          //let item_glamour = ((detailedDatchooa.item_glamour) ? '[' + detailedData.item_glamour.name + '](' + detailedData.item_glamour.url_xivdb : undefined);
 
           let baseStats = ffxivHelpers.item.packageBaseStats(kindName, detailedData.attributes_base, canBeHq);
           let attributes = ffxivHelpers.item.packageAttributes(detailedData.attributes_params);
@@ -83,30 +78,21 @@ module.exports = function (query, channel) {
           embed.addField('Attributes', attributes);
           embed.addField('Item level', levelItem, true);
           embed.addField('Equip level', levelEquip, true);
-
           embed.addField('Class/Job', classJob, true);
           embed.addField('Category', kindName)
           embed.addField('Slot', slotName, true);
           embed.addField('Materia Slots', materiaSlotCount, true);
           embed.addField('Other Properties', otherProps);
-
           //embed.addField('Recipe')
           embed.addField('Quest Reward', questRewards);
           //embed.addField('Merchant')
-
-
-
-
           //embed.addField('Can be HQ', can_be_hq, true);
           //embed.addField('Craftable', craftable, true);
           //embed.addField('Rewarded From:', quests)
           //embed.addField('Glamor Item', item_glamour, true);
-
-
             //embed.addField('Attributes', relevantData.craftable)
             embed.setFooter('Released patch ' + patch + ' | Sells for ' + priceSell, 'http://i.imgur.com/w1vhFSR.png')
             return channel.send({embed});
-
           }
         });
       }

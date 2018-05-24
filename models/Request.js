@@ -9,7 +9,7 @@ module.exports = class Request {
 
   validateCommand () {
     var validCommands = ['help', 'giphy', 'recipes', 'ffxiv', 'soundboard'];
-
+    console.log('WHY HELLO THERE', this.command)
     for (let i=0; i<validCommands.length; i++) {
       if (this.command == validCommands[i]) {
         return true;
