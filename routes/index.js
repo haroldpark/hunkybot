@@ -1,58 +1,45 @@
 module.exports = (config) => {
-  const Discord = require('discord.js');
-  const bot = new Discord.Client();
-  const embed = new Discord.RichEmbed();
 
-  const prefix = config.prefix;
+const validCommands = ['help', 'giphy', 'recipes', 'ffxiv', 'soundboard'];
 
-  //models
-  const Request = require('../models/Request.js');
-  const Response = require('../models/Response.js');
+//method to iterate through your valid commands and fulfill that request
+	  function fulfillRequest () {
+          return require("./commands/" + command)(msg, embed);
+  }
 
-  bot.on('message', msg => {
-    //prefix is $ by default
-    if (msg.content == 'test') {
-      require("./test")();
-    }
+	//dependencies to get discord api started
+  	const Discord = require('discord.js');
+  	const bot = new Discord.Client();
+  	const embed = new Discord.RichEmbed();
 
-    //verifies that message starts with our prefix
-    if (msg.content.startsWith(prefix)) {
-      let request = new Request(msg.content);
-      let command = request.command;
-      let category = request.category;
-      let query = request.query;
+  	const prefix = config.prefix;
 
-      if (!request.validateCommand()) {
-        return require("./commands/errorhandler")(msg, embed);
-      }
+  	//models
+ 	const Request = require('../models/Request.js');
+  	const Response = require('../models/Response.js');
 
-      //routes for commands
-      if (command == 'help') {
-        return require("./commands/help")(msg, embed);
-      }
+//do something when bot receives a message in the server
+  	bot.on('message', msg => {
 
-      if (command == 'soundboard') {
-        return require("./commands/soundboard")(msg, embed);
-      }
+    	if (msg.content == 'test') {
+     		require("./test")();
+    	}
 
-      if (command == 'shoppingcart') {
-        return require("./commands/shoppingcart")(msg, embed);
-      }
+    	//verifies that message starts with our prefix. prefix is $ by default
+    	if (msg.content.startsWith(prefix)) {
+//new message from discord = new request to pull up script from commands folder
+      	let request = new Request(msg.content);
+      	let command = request.command;
+      	let category = request.category;
+      	let query = request.query;
 
-      if (command == 'ffxiv') {
-        return require('./commands/ffxiv/item.js')(query, msg.channel);
-      }
+	//error handler. Checks for valid command
+if (!request.validateCommand()) {
+    return require("./commands/errorhandler")(msg, embed);
+}
 
-      if (command == 'giphy') {
-        return require("./commands/giphy")(msg, request);
-      }
-
-      if (command == 'blackjack play') {
-        return require("./commands/blackjack")(bot, msg);
-      }
-    }
-  });
-
-  //instantiates bot with token
-  bot.login(config.token);
+return fulfillRequest();
+});
+//instantiates bot with token
+	bot.login(config.token);
 }

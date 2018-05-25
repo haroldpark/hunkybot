@@ -1,7 +1,7 @@
-const helpers = require('../../helpers/helpers.js');
+const helpers = require('../helpers/helpers.js');
 const http_request = require('request');
 const Discord = require('discord.js');
-const ffxivHelpers = require('../../helpers/ffxiv_helpers.js');
+const ffxivHelpers = require('../helpers/ffxiv_helpers.js');
 
 module.exports = (query, channel) => {
 
