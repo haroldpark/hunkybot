@@ -1,10 +1,21 @@
-# hunkybot
+# Hunkybot
+My personal discord bot
 
-***Make sure to have node installed
+## Installation
+```
+git clone https://github.com/haroldpark/hunkybot
+cd hunkybot
+npm install
+```
 
-In the terminal:
-1. git clone https://github.com/hyungkip/hunkybot
-2. cd hunkybot
-3. node server.js
+## Usage
+```
+node server.js
+```
 
-Enjoy!
+## Built With
+* Javascript
+* [Discord.js](https://discordapp.com/developers/docs/intro) - Cloud-powered communication API
+
+## License
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
