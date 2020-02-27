@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyungkip/hunkybot.git"
+    "url": "git+https://github.com/haroldpark/hunkybot.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/hyungkip/hunkybot/issues"
+    "url": "https://github.com/haroldpark/hunkybot/issues"
   },
-  "homepage": "https://github.com/hyungkip/hunkybot#readme",
+  "homepage": "https://github.com/haroldpark/hunkybot#readme",
   "dependencies": {
     "discord.js": "^11.0.0",
     "howler": "^2.0.3",
